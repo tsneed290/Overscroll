@@ -676,9 +676,42 @@
                 }
             }
         }
+        
+        // add window resize listener to resize and reposition thumbs
+        $(window).resize(data, onWindowResize);
 
         target.data(datakey, data);
 
+    },
+    
+    onWindowResize = function(event) {
+        
+        var data = event.data;
+        
+        // only resize and reposition thumbs if target was actually resize as a result
+        if(data.thumbs.added && (data.target.height() != data.sizing.container.height || data.target.width() != data.sizing.container.width)) {
+
+            // get new sizing
+            data.sizing = getSizing(data.target.get(0));
+            
+            var css;
+            
+            // reset thumb css
+            css = getThumbCss(data.sizing.thumbs.vertical, data.options);
+            if(data.thumbs.vertical) {
+                data.thumbs.vertical.css(css);
+            }
+            
+            css = getThumbCss(data.sizing.thumbs.horizontal, data.options);
+            if(data.thumbs.horizontal) {
+                
+                data.thumbs.horizontal.css(css);
+            }
+            
+            // move thumbs back to their original position
+            moveThumbs(data.thumbs, data.sizing, data.target.scrollLeft(), data.target.scrollTop());
+        }
+        
     },
 
     // Removes any event listeners and other instance-specific
